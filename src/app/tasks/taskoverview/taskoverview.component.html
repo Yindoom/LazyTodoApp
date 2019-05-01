@@ -1,0 +1,26 @@
+<button (click)="logout()">Log out</button>
+<div *ngIf="tasks" >
+  <ul>
+    <li *ngFor="let task of tasks | async">
+      <h3 routerLink="taskDetail/{{task.id}}">{{task.body}}</h3>
+      <button (click)="deleteTask(task.id)">Delete</button>
+    </li>
+  </ul>
+</div>
+
+<form [formGroup]="addTaskForm" (ngSubmit)="saveTask()">
+  <label>What to do:
+    <input type="text" formControlName="body">
+  </label>
+  <label>
+    Level of done:
+    <input type="checkbox" formControlName="isDone">
+  </label>
+  <input type="file" (change)="setFile($event)" accept="image/*">
+  <image-cropper
+  style="width: 512px; height: 512px;" [imageChangedEvent]="changeEvent"
+  [maintainAspectRatio]="true" [aspectRatio]="3 / 3"
+  [resizeToWidth]="128" format="png" (imageCropped)="imageCropped($event)"></image-cropper>
+  <button type="submit">Save</button>
+</form>
+

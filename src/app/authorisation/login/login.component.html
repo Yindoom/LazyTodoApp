@@ -1,0 +1,17 @@
+<button (click)=switchUserState()>
+  <p *ngIf="newUser">Log in with email</p>
+  <p *ngIf="!newUser">Create new account</p>
+</button>
+<h2 *ngIf="newUser">Create new user</h2>
+<h2 *ngIf="!newUser">Log in with email</h2>
+<form [formGroup]="loginForm" (ngSubmit)="onSubmit()" >
+  <label>
+    Email
+    <input type="text" formControlName="email">
+  </label>
+  <label>
+    Password
+    <input type="password" formControlName="password">
+  </label>
+  <button type="submit">Log in</button>
+</form>
