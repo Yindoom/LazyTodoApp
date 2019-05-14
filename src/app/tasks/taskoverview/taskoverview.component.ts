@@ -1,64 +1,51 @@
 import { AuthorisationService } from '../../shared/services/authorisation.service';
-import { TaskService } from '../../shared/services/task.service';
 import { Task } from '../../shared/models/task.model';
 import { Observable } from 'rxjs';
-import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import {Component, OnInit} from '@angular/core';
 import { Router } from '@angular/router';
-import {ImageCroppedEvent} from 'ngx-image-cropper';
+import { TaskState } from '../../state/task.state';
+import {Select, Store} from '@ngxs/store';
+import {GetTaskById, RemoveTask, SetTasks} from '../../actions/tasks.actions';
+import {AddTaskComponent} from '../add-task/add-task.component';
+import { MatDialog } from '@angular/material';
 
 @Component({
   selector: 'app-taskoverview',
   templateUrl: './taskoverview.component.html',
   styleUrls: ['./taskoverview.component.css']
 })
+
 export class TaskoverviewComponent implements OnInit {
 
-tasks: Observable<Task[]>;
 userId;
 
-addTaskForm = new FormGroup({
-  body: new FormControl(''),
-  isDone: new FormControl('')
-});
-  croppedImage: any = '';
-  pic: File;
-  changeEvent: any = '';
+  @Select(TaskState.getTasks) tasks$: Observable<Task[]>;
 
-  constructor(public service: TaskService, public router: Router, public auth: AuthorisationService) { }
+  constructor(public router: Router, public auth: AuthorisationService, public store: Store, public dialog: MatDialog) {
+  }
 
   ngOnInit() {
     this.userId = JSON.parse(localStorage.getItem('user'));
-    this.tasks = this.service.getTasksByUId(this.userId);
-  }
-
-  saveTask() {
-    const task = this.addTaskForm.value;
-    if (task.isDone !== true) {
-      task.isDone = false;
-    }
-    if (this.croppedImage !== '') {
-      task.imgBase64 = this.croppedImage;
-    }
-    task.userId = this.userId;
-    this.service.createTask(task);
-  }
-
-  deleteTask(id: string) {
-    this.service.deleteTask(id);
+    this.store.dispatch(new SetTasks(this.userId));
   }
 
   logout() {
+    // Maybe fix this
     this.auth.logout();
     this.router.navigateByUrl('login');
   }
 
-  setFile(event) {
-    this.changeEvent = event;
-    this.pic = event.target.files[0];
+  deleteTask(id: string) {
+    this.store.dispatch(new RemoveTask(id));
+  }
+  addTask() {
+    const ref = this.dialog.open(AddTaskComponent, { data: { userId: this.userId }});
   }
 
-  imageCropped(event: ImageCroppedEvent) {
-    this.croppedImage = event.base64;
+  editTask(id: string) {
+    this.store.dispatch(new GetTaskById(id)).subscribe(t => {
+      const ref = this.dialog.open(AddTaskComponent, {
+        data: { userId: this.userId, edit: true }});
+    });
   }
 }

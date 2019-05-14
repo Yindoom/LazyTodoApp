@@ -15,9 +15,12 @@ export class TaskService {
         const data = action.payload.doc.data() as Task;
         return {
           id: action.payload.doc.id,
+          subject: data.subject,
           body: data.body,
           isDone: data.isDone,
-          userId: data.userId
+          userId: data.userId,
+          imgId: data.imgId,
+          alarmTimeStamp: data.alarmTimeStamp
         };
       });
     }));
@@ -42,11 +45,18 @@ export class TaskService {
         const data = action.payload.doc.data() as Task;
         return {
           id: action.payload.doc.id,
+          subject: data.subject,
           body: data.body,
           isDone: data.isDone,
-          userId: data.userId
+          userId: data.userId,
+          imgId: data.imgId,
+          alarmTimeStamp: data.alarmTimeStamp
         };
       });
     }));
+  }
+
+  updateTask(updatedTask: Task) {
+    this.af.collection('tasks').doc(updatedTask.id).set(updatedTask);
   }
 }

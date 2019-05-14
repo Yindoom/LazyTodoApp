@@ -28,7 +28,7 @@ export class AuthorisationService {
 
   createNewUser(email: string, password: string) {
     this.afAuth.auth.createUserWithEmailAndPassword(email, password).then(() => {
-      this.router.navigateByUrl('tasks');
+      // this.router.navigateByUrl('tasks');
     }).catch(() => {
       return false;
     });

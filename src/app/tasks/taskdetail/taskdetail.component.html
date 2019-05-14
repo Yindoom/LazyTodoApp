@@ -1,5 +1,5 @@
-<div *ngIf="task">
-  <h2>{{ (task | async)?.body }}</h2>
-  <h3>Is done: {{ (task | async)?.isDone }}</h3>
+<div *ngIf="task$">
+  <h2>{{ (task$ | async)?.body }}</h2>
+  <h3>Is done: {{ (task$ | async)?.isDone }}</h3>
   
 </div>

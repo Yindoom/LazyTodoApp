@@ -1,0 +1,41 @@
+<div mat-dialog-content>
+  <button (click)="closeModal()"><--</button>
+  <img *ngIf="imgUrl" [src]="imgUrl" style="height: 200px; width: 200px">
+      <form [formGroup]="addTaskForm" (ngSubmit)="saveTask()">
+       <div><label>What to do:
+          <input type="text" formControlName="subject">
+        </label>
+         <label>
+           Alarm
+           <input type="datetime-local" id="timeStamp" formControlName="alarmTimeStamp">
+         </label>
+       </div>
+
+        <div>
+          <label>
+            <input type="text" #input>
+          </label>
+          <button type="button" (click)="addSub(input.value)">+</button>
+
+          <ul class="mat-list-item"  *ngIf="subtasks">
+            <li *ngFor="let sub of subtasks">
+              <h3>{{sub.body}}</h3>
+              <label>
+                <input type="checkbox" [checked]="sub.isDone" (change)="sub.isDone = !sub.isDone">
+              </label>
+            </li>
+          </ul>
+        </div>
+        <input type="file" (change)="setFile($event)" accept="image/*">
+        <image-cropper *ngIf="pic"
+                       style="width: 512px;" [imageChangedEvent]="changeEvent"
+                       [maintainAspectRatio]="true" [aspectRatio]="3 / 3"
+                       [resizeToWidth]="0" (imageCropped)="imageCropped($event)"></image-cropper>
+
+        <label>
+          Level of done:
+          <input type="checkbox" formControlName="isDone">
+        </label>
+        <button type="submit">Save</button>
+      </form>
+      </div>

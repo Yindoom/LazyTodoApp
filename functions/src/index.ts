@@ -8,49 +8,118 @@ admin.initializeApp();
 
 exports.uploadTask = functions.firestore.document('tasks/{taskId}').onCreate((snap, context) => {
   console.log('Function upload called');
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     const task = snap.data();
-    console.log('initialising picture logic');
     if (task && task.imgBase64) {
-      console.log('imgBase64 found');
-      const dbRefNew = admin.database().ref();
-      const key = dbRefNew.push().key;
-     // const img = new Image();
-      // img.src = task.imgBase64;
-      if(key) {
-        const split = task.imgBase64.toString().split(',');
-        const base64EncodedImageString = split[1],
-          fileName = key.toString(),
-          mimeType = 'image/jpeg',
-          imageBuffer = new Buffer(base64EncodedImageString, 'base64');
-        task.body = task.body + " testies";
-        console.log('logic done ');
-       admin.storage().bucket().file(fileName).save(imageBuffer, { metadata: { contentType: mimeType }})
-         .then(stuff => {
-         task.imgId = fileName;
-          task.imgBase64 = null;
-          admin.firestore(admin.app()).collection('tasks').doc(snap.id).set(task).then(val => {
-            console.log('img saved maybe');
-            resolve(val);
-          }).catch(e => {
+      const split = task.imgBase64.toString().split(/[,;:]/);
+      console.log(split[0]);
+
+      if (split[0] === 'data') {
+        if(task.imgId) {
+          admin.storage().bucket().file(task.imgId).delete()
+            .then(() => console.log('Previous image deleted'))
+            .catch(e => console.log(e));
+        }
+        console.log('imgBase64 found');
+
+        const key = admin.database().ref().push().key;
+
+        if (key) {
+          const base64EncodedImageString = split[3],
+            fileName = key.toString(),
+            mimeType = split[1],
+            imageBuffer = new Buffer(base64EncodedImageString, split[2]);
+          console.log('Image logic converted');
+
+          try {
+
+            await admin.storage().bucket().file("task-pictures/" + fileName)
+              .save(imageBuffer, {metadata: {contentType: mimeType}});
+
+            /*admin.storage().bucket().file("task-pictures/" + fileName).getSignedUrl({action: 'read', expires: '01/01/3000'})
+              .then(urls => {
+                task.imgBase64 = urls[0];
+              }).catch(e => console.log(e));*/
+            task.imgBase64 = null;
+            task.imgId = fileName;
+            await admin.firestore(admin.app()).collection('tasks').doc(snap.id).set(task).then();
+
+          } catch (e) {
             console.log(e);
             reject(e);
-          });
-       }).catch(err => {
-         console.log(err);
-         reject(err);
-       }); } else {
-        reject('Key is missing');
+          }} else {
+          reject('Key is missing');
+        }
       }
+    }
+    resolve('Function completed');
+    console.log('Function complete');
+  })
+});
+
+exports.deleteImage = functions.firestore.document('tasks/{taskId}').onDelete((snap, context) => {
+  return new Promise((resolve, reject) => {
+    const task = snap.data();
+    if(task && task.imgId) {
+      console.log('Image for deletion found ' + task.imgId);
+      admin.storage().bucket().file("task-pictures/" + task.imgId).delete().then(() => {
+        console.log('Img deleted');
+        resolve('Img Deleted');
+      }).catch(e => {
+        console.log(e);
+        reject('Error happened '+ e);
+      });
     }
   })
 });
-/*
-exports.deleteTask = functions.firestore.document('tasks/{taskId}').onDelete(((snapshot, context) => {
 
-}))
+exports.updateTask = functions.firestore.document('tasks/{taskId}').onUpdate((snap, context) => {
+  console.log('Function upload called');
+  return new Promise(async (resolve, reject) => {
+    const task = snap.after.data();
+    if (task && task.imgBase64) {
+      const split = task.imgBase64.toString().split(/[,;:]/);
+      console.log(split[0]);
 
- exports.helloWorld = functions.https.onRequest((request, response) => {
-  response.send("Hello from Firebase!");
- });
-*/
+      if (split[0] === 'data') {
+        if(task.imgId) {
+          admin.storage().bucket().file(task.imgId).delete()
+            .then(() => console.log('Previous image deleted'))
+            .catch(e => console.log(e));
+        }
+        console.log('imgBase64 found');
+
+        const key = admin.database().ref().push().key;
+
+        if (key) {
+          const base64EncodedImageString = split[3],
+            fileName = key.toString(),
+            mimeType = split[1],
+            imageBuffer = new Buffer(base64EncodedImageString, split[2]);
+          console.log('Image logic converted');
+
+          try {
+
+            await admin.storage().bucket().file("task-pictures/" + fileName)
+              .save(imageBuffer, {metadata: {contentType: mimeType}});
+
+            /*admin.storage().bucket().file("task-pictures/" + fileName).getSignedUrl({action: 'read', expires: '01/01/3000'})
+              .then(urls => {
+                task.imgBase64 = urls[0];
+              }).catch(e => console.log(e));*/
+            task.imgId = fileName;
+
+          } catch (e) {
+            console.log(e);
+            reject(e);
+          }} else {
+          reject('Key is missing');
+        }
+      }
+      task.imgBase64 = null;
+      await admin.firestore(admin.app()).collection('tasks').doc(snap.after.id).set(task).then();
+    }
+    resolve('Function completed');
+    console.log('Function complete');
+  })
+});
