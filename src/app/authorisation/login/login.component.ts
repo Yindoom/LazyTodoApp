@@ -1,4 +1,3 @@
-import { Router } from '@angular/router';
 import { FormGroup, FormControl } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { AuthorisationService } from 'src/app/shared/services/authorisation.service';
@@ -11,8 +10,9 @@ import { AuthorisationService } from 'src/app/shared/services/authorisation.serv
 export class LoginComponent implements OnInit {
 
   newUser = false;
+  errorMessage;
 
-  constructor(public authService: AuthorisationService, public router: Router) { }
+  constructor(public authService: AuthorisationService) { }
 
   loginForm = new FormGroup({
     email: new FormControl(''),
@@ -24,14 +24,23 @@ export class LoginComponent implements OnInit {
 
   switchUserState() {
     this.newUser = !this.newUser;
+    this.errorMessage = null;
   }
 
   onSubmit() {
     const user = this.loginForm.value;
     if (this.newUser) {
-      this.authService.createNewUser(user.email, user.password);
+      this.authService.createNewUser(user.email, user.password).catch(err => {
+        this.errorMessage = err;
+      });
     } else {
-      this.authService.loginEmail(user.email, user.password);
+      this.authService.loginEmail(user.email, user.password).catch(err => {
+        this.errorMessage = err;
+      });
     }
+  }
+
+  loginGoogle() {
+    this.authService.loginGoogle();
   }
 }

@@ -13,5 +13,8 @@
     Password
     <input type="password" formControlName="password">
   </label>
-  <button type="submit">Log in</button>
+  <button style="margin-left: 5px" type="submit">Log in</button>
 </form>
+<h2 *ngIf="errorMessage">{{errorMessage}}</h2>
+
+<button (click)="loginGoogle()" style="margin-top: 10px">GOogle login</button>

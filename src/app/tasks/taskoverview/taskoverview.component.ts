@@ -21,18 +21,16 @@ userId;
 
   @Select(TaskState.getTasks) tasks$: Observable<Task[]>;
 
-  constructor(public router: Router, public auth: AuthorisationService, public store: Store, public dialog: MatDialog) {
+  constructor(public auth: AuthorisationService, public store: Store, public dialog: MatDialog) {
   }
 
   ngOnInit() {
-    this.userId = JSON.parse(localStorage.getItem('user'));
+    this.userId = localStorage.getItem('user');
     this.store.dispatch(new SetTasks(this.userId));
   }
 
   logout() {
-    // Maybe fix this
     this.auth.logout();
-    this.router.navigateByUrl('login');
   }
 
   deleteTask(id: string) {

@@ -1,6 +1,6 @@
 <div mat-dialog-content>
   <button (click)="closeModal()"><--</button>
-  <img *ngIf="imgUrl" [src]="imgUrl" style="height: 200px; width: 200px">
+  <img *ngIf="imgUrl" [src]="imgUrl" style="height: 200px; width: 200px; float: right">
       <form [formGroup]="addTaskForm" (ngSubmit)="saveTask()">
        <div><label>What to do:
           <input type="text" formControlName="subject">
@@ -19,9 +19,10 @@
 
           <ul class="mat-list-item"  *ngIf="subtasks">
             <li *ngFor="let sub of subtasks">
-              <h3>{{sub.body}}</h3>
+              <h3 class="subBody">{{sub.body}}</h3>
               <label>
-                <input type="checkbox" [checked]="sub.isDone" (change)="sub.isDone = !sub.isDone">
+                Completed:
+                <input type="checkbox" [checked]="sub.isDone" (change)="sub.isDone = !sub.isDone" style="margin-bottom: 5px;">
               </label>
             </li>
           </ul>
@@ -33,9 +34,9 @@
                        [resizeToWidth]="0" (imageCropped)="imageCropped($event)"></image-cropper>
 
         <label>
-          Level of done:
+          Completed:
           <input type="checkbox" formControlName="isDone">
         </label>
-        <button type="submit">Save</button>
+        <button type="submit" style="margin-top: 10px">Save</button>
       </form>
       </div>

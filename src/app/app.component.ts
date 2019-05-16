@@ -21,6 +21,6 @@ export class AppComponent implements OnInit {
         localStorage.removeItem('user');
         this.router.navigateByUrl('login');
       }
-    });
+    }, error1 => console.log(error1));
   }
 }

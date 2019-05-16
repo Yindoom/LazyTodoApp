@@ -8,6 +8,9 @@ import { map } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class TaskService {
+
+  constructor(public af: AngularFirestore) { }
+
   getTasksByUId(userId: string): Observable<Task[]> {
     return this.af.collection<Task>('tasks', ref => ref.where('userId', '==', userId)).snapshotChanges()
     .pipe(map(actions => {
@@ -26,34 +29,12 @@ export class TaskService {
     }));
   }
 
-  getTaskById(id: string): Observable<Task> {
-    return this.af.doc<Task>('tasks/' + id).valueChanges();
-  }
   deleteTask(id: string) {
     this.af.collection('tasks').doc(id).delete();
   }
 
-  constructor(public af: AngularFirestore) { }
-
   createTask(task: Task) {
     this.af.collection('tasks').add(task);
-  }
-
-  getTasks(): Observable<Task[]> {
-    return this.af.collection<Task>('tasks').snapshotChanges().pipe(map(actions => {
-      return actions.map(action => {
-        const data = action.payload.doc.data() as Task;
-        return {
-          id: action.payload.doc.id,
-          subject: data.subject,
-          body: data.body,
-          isDone: data.isDone,
-          userId: data.userId,
-          imgId: data.imgId,
-          alarmTimeStamp: data.alarmTimeStamp
-        };
-      });
-    }));
   }
 
   updateTask(updatedTask: Task) {

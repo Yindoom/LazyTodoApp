@@ -16,6 +16,7 @@ import {FileService} from '../../shared/services/file.service';
   styleUrls: ['./add-task.component.css']
 })
 export class AddTaskComponent implements OnInit {
+  imgId: string;
 
   constructor(public store: Store, public file: FileService, @Inject(MAT_DIALOG_DATA) public data: any,
               public dialogRef: MatDialogRef<AddTaskComponent>) { }
@@ -73,6 +74,7 @@ export class AddTaskComponent implements OnInit {
 
     if (this.edit) {
       task.id = this.id;
+      task.imgId = this.imgId;
       this.store.dispatch(new UpdateTask(task));
     } else {
       this.store.dispatch(new AddTask(task));
@@ -93,17 +95,18 @@ export class AddTaskComponent implements OnInit {
   parseTask() {
     this.editTask$.subscribe(task => {
       this.id = task.id;
-
       this.subtasks = task.body;
 
       if (task.imgId) {
+        this.imgId = task.imgId;
         this.file.getUrlByid(task.imgId).subscribe(url => {
           this.imgUrl = url;
         });
       }
       this.addTaskForm.patchValue({
         subject: task.subject,
-        isDone: task.isDone
+        isDone: task.isDone,
+        alarmTimeStamp: task.alarmTimeStamp
       });
     });
   }
@@ -113,7 +116,6 @@ export class AddTaskComponent implements OnInit {
       body: input,
       isDone: false
     };
-
     this.subtasks.push(sub);
   }
 
