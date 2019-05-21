@@ -1,25 +1,23 @@
 import { TestBed, async } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { AppComponent } from './app.component';
-import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {AngularFireAuth} from '@angular/fire/auth';
-import {FirebaseAuthStub} from './Mock/FirebaseMocks';
-import {Router} from '@angular/router';
 
 describe('AppComponent', () => {
+
+  let fireMock;
   beforeEach(async(() => {
+    fireMock = jasmine.createSpyObj('AngularFireAuth', ['authState']);
     TestBed.configureTestingModule({
       imports: [
-        RouterTestingModule/*.withRoutes([{ path: 'tasks', loadChildren: './tasks/tasks.module#TasksModule'},
-          { path: 'login', loadChildren: './authorisation/authorisation.module#AuthorisationModule'}])*/
+        RouterTestingModule
       ],
       declarations: [
         AppComponent
       ],
       providers: [
-        {provide: AngularFireAuth, useClass: FirebaseAuthStub}
-        // {provide: Router, useClass: RouterTestingModule}
-      ]
+        {provide: AngularFireAuth, useValue: fireMock}
+        ]
     }).compileComponents();
   }));
 

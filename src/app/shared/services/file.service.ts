@@ -9,7 +9,7 @@ export class FileService {
 
   constructor(public storage: AngularFireStorage) { }
 
-  getUrlByid(id: string): Observable<any> {
+  getUrlByid(id: string): Observable<string> {
     return this.storage.ref('task-pictures/' + id).getDownloadURL();
   }
 }
