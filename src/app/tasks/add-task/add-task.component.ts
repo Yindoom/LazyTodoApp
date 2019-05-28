@@ -74,7 +74,9 @@ export class AddTaskComponent implements OnInit {
 
     if (this.edit) {
       task.id = this.id;
-      task.imgId = this.imgId;
+      if (this.imgId) {
+        task.imgId = this.imgId;
+      }
       this.store.dispatch(new UpdateTask(task));
     } else {
       this.store.dispatch(new AddTask(task));

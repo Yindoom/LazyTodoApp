@@ -6,10 +6,11 @@ admin.initializeApp();
 // // Start writing Firebase Functions
 // // https://firebase.google.com/docs/functions/typescript
 
-exports.uploadTask = functions.firestore.document('tasks/{taskId}').onCreate((snap, context) => {
-  console.log('Function upload called');
+exports.taskChange = functions.firestore.document('tasks/{taskId}').onCreate((snap, context) => {
+  console.log('Function new called');
   return new Promise(async (resolve, reject) => {
     const task = snap.data();
+    console.log(snap.id);
     if (task && task.imgBase64) {
       const split = task.imgBase64.toString().split(/[,;:]/);
       console.log(split[0]);
@@ -74,9 +75,10 @@ exports.deleteImage = functions.firestore.document('tasks/{taskId}').onDelete((s
 });
 
 exports.updateTask = functions.firestore.document('tasks/{taskId}').onUpdate((snap, context) => {
-  console.log('Function upload called');
+  console.log('Function update called');
   return new Promise(async (resolve, reject) => {
     const task = snap.after.data();
+    console.log(snap.after.id);
     if (task && task.imgBase64) {
       const split = task.imgBase64.toString().split(/[,;:]/);
       console.log(split[0]);
